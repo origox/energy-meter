@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include "WiFiSetup/WiFiSetup.h"
+#include <WiFiSetup.h>
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial1.begin(115200);
 
   connectToWiFi();
@@ -16,5 +16,5 @@ void loop() {
 
     //parseAndPublishData(line);  // Process and publish parsed data
   }
-  delay(1000);
+  delay(1000); 
 }
