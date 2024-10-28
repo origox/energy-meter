@@ -60,19 +60,3 @@ void parseAndPublishData(const String& line) {
         publishReadout(obis->topic, value + obis->unit);
     }
 }
-
-// void parseAndPublishData(const String& line) {
-//   // publishReadout("raw_data", line);
-//   for (const ObisCode& obis : obisCodes) {
-//     if (line.indexOf(obis.code) >= 0) {
-//       String value = extractValue(line, obis.unit[0] == ' ' ? '*' : 'S');
-//       if (!value.isEmpty()) {
-//         publishReadout(obis.topic, value + obis.unit);
-//         Serial.println("Published: Topic: " + String(obis.topic) + " Payload: " + value + obis.unit);
-//       }
-//       return;
-//     }
-//   }
-//   Serial.println("No recognized OBIS code found.");
-//   publishReadout("unknown", line);
-// }

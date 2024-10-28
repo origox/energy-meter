@@ -40,16 +40,3 @@ void loop() {
     }
   }
 }
-
-// void loop() {
-//   if (Serial1.available() > 0) {
-//     String line = Serial1.readStringUntil('\n');
-//     line.trim();  // Remove any whitespace or newline characters
-//     Serial.println("Raw data: " + line);
-
-//     publishReadout("LINE: ", line);  // Publish raw data
-
-//     parseAndPublishData(line);  // Process and publish parsed data
-//   }
-//   delay(3000); 
-// }
