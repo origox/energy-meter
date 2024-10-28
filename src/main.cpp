@@ -2,10 +2,13 @@
 #include <WiFiSetup.h>
 #include <MqttHelper.h>
 #include <ObisParser.h>
+<<<<<<< HEAD
 
 const int bufferSize = 256;  // Define a buffer size
 char buffer[bufferSize];     // Buffer to store incoming data
 int bufferIndex = 0;         // Index to keep track of buffer position
+=======
+>>>>>>> 373819b0fea4934a474927bb43f7b7e0dbea264d
 
 void setup() {
   Serial.begin(9600);
@@ -24,6 +27,7 @@ void loop() {
       line.trim();  // Remove any whitespace or newline characters
       Serial.println("Raw data: " + line);
 
+<<<<<<< HEAD
       publishReadout("LINE: ", line);  // Publish raw data
 
       parseAndPublishData(line);  // Process and publish parsed data
@@ -38,6 +42,9 @@ void loop() {
         bufferIndex = 0;  // Reset buffer index
       }
     }
+=======
+    parseAndPublishData(line);  // Process and publish parsed data
+>>>>>>> 373819b0fea4934a474927bb43f7b7e0dbea264d
   }
 }
 

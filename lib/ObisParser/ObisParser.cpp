@@ -53,6 +53,7 @@ String extractValue(const String& line, char endChar) {
 }
 
 void parseAndPublishData(const String& line) {
+<<<<<<< HEAD
     const ObisCode* obis = getObisCodeInfo(line);
     if (obis) {
         String value = extractValue(line, obis->unit[0] == ' ' ? '*' : 'W');
@@ -76,3 +77,17 @@ void parseAndPublishData(const String& line) {
 //   Serial.println("No recognized OBIS code found.");
 //   publishReadout("unknown", line);
 // }
+=======
+  for (const ObisCode& obis : obisCodes) {
+    if (line.indexOf(obis.code) >= 0) {
+      String value = extractValue(line, obis.unit[0] == ' ' ? '*' : 'S');
+      if (!value.isEmpty()) {
+        publishReadout(obis.topic, value + obis.unit);
+        Serial.println("Published: Topic: " + String(obis.topic) + " Payload: " + value + obis.unit);
+      }
+      return;
+    }
+  }
+  Serial.println("No recognized OBIS code found.");
+}
+>>>>>>> 373819b0fea4934a474927bb43f7b7e0dbea264d
