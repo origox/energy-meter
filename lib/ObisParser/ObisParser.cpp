@@ -19,7 +19,7 @@ const ObisCode obisCodes[] = {
   {"1-0:4.7.0(", "current_reactive_returned", " kVAr"},
   {"1-0:21.7.0(", "current_energy_usage_phase1", " kWh"},
   {"1-0:41.7.0(", "current_energy_usage_phase2", " kWh"},
-  {"1-0:61.7.0(", "current_energy_usage_phase2", " kWh"},  
+  {"1-0:61.7.0(", "current_energy_usage_phase3", " kWh"},  
   {"1-0:22.7.0(", "current_energy_returned_phase1", " kWh"},
   {"1-0:42.7.0(", "current_energy_returned_phase2", " kWh"},
   {"1-0:62.7.0(", "current_energy_returned_phase3", " kWh"},
