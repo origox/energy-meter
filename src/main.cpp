@@ -2,10 +2,13 @@
 #include <WiFiSetup.h>
 #include <MqttHelper.h>
 #include <ObisParser.h>
+#include <SystemInfo.h> 
 
 const int bufferSize = 256;  // Define a buffer size
 char buffer[bufferSize];     // Buffer to store incoming data
 int bufferIndex = 0;         // Index to keep track of buffer position
+unsigned long lastTempReadTime = 0;  // Last time temperature was read
+const unsigned long tempReadInterval = 2000;  // Interval to read temperature (every 2 seconds)
 
 void setup() {
   Serial.begin(9600);
@@ -13,9 +16,17 @@ void setup() {
 
   connectToWiFi();
   setupMqtt();
+  printSystemInfo();
 }
 
 void loop() {
+  // Read and publish temperature periodically
+  unsigned long currentTime = millis();
+  if (currentTime - lastTempReadTime >= tempReadInterval) {
+    lastTempReadTime = currentTime;
+    readAndPublishSystemInfo();  // Read and publish temperature
+  }
+
   while (Serial1.available() > 0) {
     char incomingByte = Serial1.read();
     if (incomingByte == '\n') {
