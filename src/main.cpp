@@ -3,6 +3,7 @@
 #include <MqttHelper.h>
 #include <ObisParser.h>
 #include <SystemInfo.h> 
+#include <DHTSensor.h> 
 
 const int bufferSize = 256;  // Define a buffer size
 char buffer[bufferSize];     // Buffer to store incoming data
@@ -16,6 +17,7 @@ void setup() {
 
   connectToWiFi();
   setupMqtt();
+  setupDHT();
   printSystemInfo();
 }
 
@@ -25,6 +27,7 @@ void loop() {
   if (currentTime - lastTempReadTime >= tempReadInterval) {
     lastTempReadTime = currentTime;
     readAndPublishSystemInfo();  // Read and publish temperature
+    readAndPublishDHTData();  // Read and publish DHT data
   }
 
   while (Serial1.available() > 0) {
