@@ -7,3 +7,4 @@
 
 # Ignore secrets
 arduino_secrets.h
+*.bak

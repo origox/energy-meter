@@ -9,7 +9,7 @@ const int bufferSize = 256;  // Define a buffer size
 char buffer[bufferSize];     // Buffer to store incoming data
 int bufferIndex = 0;         // Index to keep track of buffer position
 unsigned long lastTempReadTime = 0;  // Last time temperature was read
-const unsigned long tempReadInterval = 2000;  // Interval to read temperature (every 2 seconds)
+const unsigned long tempReadInterval = 10000;  // Interval to read temperature (every 10 seconds)
 
 void setup() {
   Serial.begin(9600);

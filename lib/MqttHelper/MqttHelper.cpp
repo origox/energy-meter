@@ -1,7 +1,8 @@
 #include <MqttHelper.h>
-#include <WiFiClient.h>
+#include <WiFiNINA.h>
+#include <WiFiSSLClient.h>
 
-WiFiClient wifiClient;
+WiFiSSLClient wifiClient;
 PubSubClient client(wifiClient);
 
 void reconnect() {
@@ -21,7 +22,7 @@ void reconnect() {
 void setupMqtt() {
   client.setServer(SECRET_MQTT_SERVER, SECRET_MQTT_PORT);
   reconnect();
-  client.publish("apa", "bepa");
+  client.publish("debug", "setupMqtt() called");
 }
 
 void publishReadout(const String& topic, const String& payload) {
