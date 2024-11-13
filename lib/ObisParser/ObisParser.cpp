@@ -57,6 +57,7 @@ void parseAndPublishData(const String& line) {
     if (obis) {
         String value = extractValue(line, obis->unit[0] == ' ' ? '*' : 'W');
         //Serial.println(obis->topic + ": " + value + obis->unit);
-        publishReadout(obis->topic, value + obis->unit);
+        //publishReadout(obis->topic, value + obis->unit);
+        publishReadout(obis->topic, value);
     }
 }
