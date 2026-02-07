@@ -6,5 +6,6 @@
 #include <arduino_secrets.h> // Include secrets file
 
 void connectToWiFi();
+void checkWiFiConnection();
 
 #endif // WIFI_SETUP_H

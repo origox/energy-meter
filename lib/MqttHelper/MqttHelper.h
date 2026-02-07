@@ -5,6 +5,7 @@
 #include <arduino_secrets.h>
 
 void setupMqtt();
-void publishReadout(const String& topic, const String& payload);
+void mqttLoop();  // Call this in main loop to maintain connection
+bool publishReadout(const String& topic, const String& payload);  // Returns true if publish succeeded
 
 #endif // MQTT_HELPER_H
