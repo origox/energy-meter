@@ -4,6 +4,7 @@
 #include <arduino_secrets.h>
 #include <ObisParser.h>
 #include <MqttHelper.h>
+// #include <DHTSensor.h>  // Disabled - no DHT sensor connected
 
 // Buffer for P1 data
 const int bufferSize = 512;
@@ -15,6 +16,8 @@ unsigned long lastWiFiCheckTime = 0;
 const unsigned long wifiCheckInterval = 30000;  // Check WiFi every 30 seconds
 unsigned long lastHeartbeatTime = 0;
 const unsigned long heartbeatInterval = 30000;  // Heartbeat every 30 seconds
+// unsigned long lastDHTReadTime = 0;  // Disabled - no DHT sensor
+// const unsigned long dhtReadInterval = 15000;  // Read DHT sensor every 15 seconds (for testing)
 
 // Connection states
 bool wifiConnected = false;
@@ -33,6 +36,10 @@ void setup() {
   
   // Initialize MqttHelper (handles all MQTT operations)
   setupMqtt();
+  
+  // Initialize DHT sensor - DISABLED (no sensor connected)
+  // setupDHT();
+  // Serial.println("DHT22 sensor initialized");
   
   Serial.println("Setup complete - starting main loop");
 }
@@ -103,6 +110,16 @@ void loop() {
       Serial.println("Heartbeat sent to MQTT");
     }
   }
+  
+  // Read and publish DHT sensor data periodically - DISABLED (no sensor connected)
+  /*
+  if (currentTime - lastDHTReadTime >= dhtReadInterval) {
+    lastDHTReadTime = currentTime;
+    Serial.println("=== DHT SENSOR READ CYCLE ===");
+    Serial.println("Time since last read: " + String(currentTime - lastDHTReadTime + dhtReadInterval) + " ms");
+    readAndPublishDHTData();
+  }
+  */
   
   // Read P1 data
   while (Serial1.available() > 0) {
