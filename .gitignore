@@ -8,6 +8,9 @@
 # Ignore secrets
 arduino_secrets.h
 *.bak
+
+# Include template (safe to share)
+!arduino_secrets.h.template
 ANALYSIS.md
 FIXES_APPLIED.md
 README_FIXES.md

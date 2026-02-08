@@ -59,9 +59,9 @@ adafruit/Adafruit Unified Sensor@^1.1.14
    cd energy-meter
    ```
 
-2. **Configure secrets**: Copy and edit the secrets file:
+2. **Configure secrets**: Copy and edit the secrets template:
    ```bash
-   cp lib/ArduinoSecrets/arduino_secrets.h.bak lib/ArduinoSecrets/arduino_secrets.h
+   cp lib/ArduinoSecrets/arduino_secrets.h.template lib/ArduinoSecrets/arduino_secrets.h
    ```
 
 3. **Edit configuration**: Update `arduino_secrets.h` with your settings:
