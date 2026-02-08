@@ -8,3 +8,6 @@
 # Ignore secrets
 arduino_secrets.h
 *.bak
+ANALYSIS.md
+FIXES_APPLIED.md
+README_FIXES.md
