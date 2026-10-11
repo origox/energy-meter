@@ -4,6 +4,8 @@
 #include <arduino_secrets.h>
 #include <ObisParser.h>
 #include <MqttHelper.h>
+#include <WifiSetup.h>
+#include <Adafruit_SleepyDog.h>
 // #include <DHTSensor.h>  // Disabled - no DHT sensor connected
 
 // Buffer for P1 data
@@ -12,29 +14,36 @@ char buffer[bufferSize];
 int bufferIndex = 0;
 
 // Timing variables
-unsigned long lastWiFiCheckTime = 0;
-const unsigned long wifiCheckInterval = 30000;  // Check WiFi every 30 seconds
 unsigned long lastHeartbeatTime = 0;
 const unsigned long heartbeatInterval = 30000;  // Heartbeat every 30 seconds
 // unsigned long lastDHTReadTime = 0;  // Disabled - no DHT sensor
 // const unsigned long dhtReadInterval = 15000;  // Read DHT sensor every 15 seconds (for testing)
 
-// Connection states
-bool wifiConnected = false;
+// Reboot if no heartbeat has reached the broker for this long. Catches the
+// case where the loop still runs but WiFi/MQTT never come back.
+unsigned long lastHeartbeatOkTime = 0;
+const unsigned long maxOfflineTime = 600000;  // 10 minutes
+
+// Hardware watchdog: reboots the board if loop() stalls, e.g. a hang inside
+// the WiFiNINA driver. 16 s is the SAMD21 maximum.
+const int watchdogTimeoutMs = 16000;
+
+uint8_t resetCause = 0;  // PM->RCAUSE: 0x01 power-on, 0x04 brownout (3.3 V), 0x10 reset pin, 0x20 watchdog, 0x40 software
 
 void setup() {
+  resetCause = Watchdog.resetCause();
+  Watchdog.enable(watchdogTimeoutMs);
+
   Serial.begin(9600);
   delay(3000);
   
-  Serial.println("\n=== ENERGY METER FINAL VERSION ===");
-  Serial.println("- All critical fixes applied");
-  Serial.println("- Non-blocking WiFi/MQTT"); 
-  Serial.println("- Works with/without P1 connection");
-  Serial.println("- Robust error handling");
+  Serial.println("\n=== ENERGY METER ===");
+  Serial.print("Reset cause: 0x");
+  Serial.println(resetCause, HEX);
   
   Serial1.begin(115200);  // P1 port
   
-  // Initialize MqttHelper (handles all MQTT operations)
+  // Initialize MqttHelper (handles all WiFi/MQTT operations)
   setupMqtt();
   
   // Initialize DHT sensor - DISABLED (no sensor connected)
@@ -44,71 +53,35 @@ void setup() {
   Serial.println("Setup complete - starting main loop");
 }
 
-void attemptWiFiConnection() {
-  static int wifiAttempts = 0;
-  const int maxWifiAttempts = 10;  // 5 second timeout
-  
-  if (WiFi.status() == WL_CONNECTED) {
-    if (!wifiConnected) {
-      Serial.println("WiFi connected!");
-      Serial.print("IP address: ");
-      Serial.println(WiFi.localIP());
-      wifiConnected = true;
-    }
-    return;
-  }
-  
-  if (wifiAttempts == 0) {
-    Serial.print("Connecting to WiFi: ");
-    Serial.println(SECRET_SSID);
-    WiFi.begin(SECRET_SSID, SECRET_PASS);
-  }
-  
-  wifiAttempts++;
-  if (wifiAttempts >= maxWifiAttempts) {
-    Serial.println("WiFi connection timeout - continuing without WiFi");
-    wifiConnected = false;
-    wifiAttempts = 0;
-    return;
-  }
-  
-  Serial.print(".");
-  delay(500);
-}
-
-void attemptMqttConnection() {
-  // MqttHelper handles all MQTT connection logic
-  // This function is no longer needed but kept for compatibility
-}
-
 void loop() {
+  Watchdog.reset();
   unsigned long currentTime = millis();
   
-  // Maintain MQTT connection (MqttHelper handles all MQTT operations)
+  // Maintain WiFi + MQTT connection (MqttHelper handles reconnects)
   mqttLoop();
-  
-  // Check/reconnect WiFi periodically
-  if (currentTime - lastWiFiCheckTime >= wifiCheckInterval) {
-    lastWiFiCheckTime = currentTime;
-    if (WiFi.status() != WL_CONNECTED && wifiConnected) {
-      Serial.println("WiFi disconnected");
-      wifiConnected = false;
-    }
-    if (!wifiConnected) {
-      attemptWiFiConnection();
-    }
-  }
   
   // Send heartbeat
   if (currentTime - lastHeartbeatTime >= heartbeatInterval) {
     lastHeartbeatTime = currentTime;
-    String status = "WiFi:" + String(wifiConnected ? "OK" : "NO") + " MQTT:OK";
+    bool wifiOk = WiFi.status() == WL_CONNECTED;
+    String status = "WiFi:" + String(wifiOk ? "OK" : "NO") + " MQTT:" + String(mqttConnected() ? "OK" : "NO");
     Serial.println("Status: " + status);
     
     if (publishReadout("status", status)) {
+      lastHeartbeatOkTime = currentTime;
       publishReadout("uptime", String(currentTime / 1000));
+      publishReadout("rssi", String(WiFi.RSSI()));
+      publishReadout("wifi_reconnects", String(wifiReconnectCount));
+      publishReadout("mqtt_reconnects", String(mqttReconnectCount));
+      publishReadout("reset_cause", String(resetCause));
       Serial.println("Heartbeat sent to MQTT");
     }
+  }
+  
+  if (currentTime - lastHeartbeatOkTime >= maxOfflineTime) {
+    Serial.println("No heartbeat delivered for 10 minutes - rebooting");
+    Serial.flush();
+    NVIC_SystemReset();
   }
   
   // Read and publish DHT sensor data periodically - DISABLED (no sensor connected)

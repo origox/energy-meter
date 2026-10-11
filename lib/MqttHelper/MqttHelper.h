@@ -4,8 +4,11 @@
 #include <PubSubClient.h>
 #include <arduino_secrets.h>
 
+extern unsigned long mqttReconnectCount;
+
 void setupMqtt();
 void mqttLoop();  // Call this in main loop to maintain connection
+bool mqttConnected();
 bool publishReadout(const String& topic, const String& payload);  // Returns true if publish succeeded
 
 #endif // MQTT_HELPER_H

@@ -105,8 +105,12 @@ The device publishes data to the following MQTT topics:
 | `current_power_returned` | Current power production | kW |
 | `voltage_phase1/2/3` | Voltage per phase | V |
 | `current_phase1/2/3` | Current per phase | A |
-| `status` | Device status | |
+| `status` | WiFi and MQTT state, e.g. `WiFi:OK MQTT:OK` | |
 | `uptime` | Device uptime | seconds |
+| `rssi` | WiFi signal strength | dBm |
+| `wifi_reconnects` | WiFi (re)connects since boot | count |
+| `mqtt_reconnects` | MQTT (re)connects since boot | count |
+| `reset_cause` | Why the board last rebooted (SAMD21 `PM->RCAUSE`): 1 power-on, 4 brownout, 16 reset pin, 32 watchdog, 64 offline reboot | |
 
 ### Serial Communication
 
@@ -134,10 +138,15 @@ The device publishes data to the following MQTT topics:
 
 ### Status Indicators
 
-- **WiFi Status**: Monitored every 30 seconds
-- **MQTT Status**: Automatic reconnection with backoff
-- **Heartbeat**: Status published every 30 seconds
+- **WiFi/MQTT**: Reconnect attempted every 5 seconds; each WiFi reconnect power-cycles the NINA module (`WiFi.end()` before `WiFi.begin()`)
+- **Heartbeat**: `status`, `uptime`, `rssi`, reconnect counters and `reset_cause` published every 30 seconds
+- **Watchdog**: A 16 s hardware watchdog reboots the board if the main loop stalls
+- **Offline reboot**: The board reboots if no heartbeat has reached the broker for 10 minutes
 - **P1 Data**: Real-time parsing and publishing
+
+### Power
+
+The WiFi radio draws current bursts when it starts and transmits. A weak supply makes the 3.3 V rail sag, and the board resets with `reset_cause` 4 (brownout) or the WiFi drops out while the board keeps running. Use a short, good USB cable on the bench. On the P1 port, which is typically specified for about 250 mA, put a 470–1000 µF capacitor across 5 V/GND on the adapter board.
 
 ### Debugging
 

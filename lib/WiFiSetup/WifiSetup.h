@@ -5,7 +5,9 @@
 #include <WiFiNINA.h>
 #include <arduino_secrets.h> // Include secrets file
 
+extern unsigned long wifiReconnectCount;
+
 void connectToWiFi();
-void checkWiFiConnection();
+bool checkWiFiConnection();  // Reconnects if needed; returns true when connected
 
 #endif // WIFI_SETUP_H
